@@ -12,7 +12,7 @@ import Rank from './components/Rank/Rank'
 import FaceRecognition from './components/FaceRecognition/FaceRecognition';
 
 const app = new Clarifai.App({
-    apiKey: '<insert your own api key here>'
+    apiKey: '7c00339e1db04c39a13c05393b2d5204'
 })
 class App extends React.Component {
     // define constructor

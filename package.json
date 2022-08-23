@@ -9,8 +9,10 @@
     "clarifai": "^2.9.1",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
+    "react-parallax-tilt": "^1.7.58",
     "react-scripts": "4.0.2",
-    "react-tilt": "^0.1.4",
+    "react-tsparticles": "^2.2.3",
+    "tsparticles": "^2.2.3",
     "web-vitals": "^2.1.4"
   },
   "scripts": {

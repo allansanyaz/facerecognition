@@ -12,8 +12,9 @@ import Rank from './components/Rank/Rank'
 import FaceRecognition from './components/FaceRecognition/FaceRecognition';
 
 const app = new Clarifai.App({
-    apiKey: '7c00339e1db04c39a13c05393b2d5204'
+    apiKey: '<Your API key here>'
 })
+
 class App extends React.Component {
     // define constructor
     constructor() {
@@ -25,7 +26,24 @@ class App extends React.Component {
             box: {},
             route: 'signin',
             isSignedIn: false,
+            user: {
+                id: '',
+                name: '',
+                email: '',
+                entries: 0,
+                joined: '',
+            }
         }
+    }
+
+    loadUser = (user) => {
+        this.setState({user: {
+            id: user.id,
+            name: user.name,
+            email: user.email,
+            entries: user.entries,
+            joined: user.joined,
+        }})
     }
 
     calculateFaceLocation = (data) => {
@@ -59,7 +77,21 @@ class App extends React.Component {
         app.models.predict(
             Clarifai.FACE_DETECT_MODEL, 
             this.state.input)
-            .then((response) => this.displayFaceBox(this.calculateFaceLocation(response)))
+            .then((response) => {
+                if(response) {
+                    fetch('http://localhost:4000/image', {
+                        method: 'put',
+                        headers: {'Content-Type': 'application/json'},
+                        body: JSON.stringify({id: this.state.user.id})
+                    })
+                    .then(response => response.json())
+                    .then(entry => {
+                        this.setState(Object.assign(this.state.user, {entries: entry}))
+                    })
+                    .catch(err => console.log(err));
+                }
+                this.displayFaceBox(this.calculateFaceLocation(response))
+            })
             .catch(err => console.log(err));
     }
 
@@ -81,7 +113,10 @@ class App extends React.Component {
                 { this.state.route === 'home' 
                 ?   <React.Fragment>
                         <Logo />
-                        <Rank />
+                        <Rank 
+                            username={this.state.user.name}
+                            userentries={this.state.user.entries}
+                        />
                         <ImageLinkForm 
                             onInputChange={this.onInputChange} 
                             onButtonSubmit={this.onButtonSubmit} />
@@ -92,8 +127,14 @@ class App extends React.Component {
                     </React.Fragment>
                 :   (
                         this.state.route === 'signin' 
-                        ? <SignIn onRouteChange={this.onRouteChange} />
-                        : <Register onRouteChange={this.onRouteChange} />
+                        ? <SignIn 
+                            loadUser={this.loadUser}
+                            onRouteChange={this.onRouteChange} 
+                        />
+                        : <Register 
+                            loadUser={this.loadUser}
+                            onRouteChange={this.onRouteChange} 
+                        />
                     )
                     
                 }

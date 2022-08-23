@@ -36,3 +36,20 @@
     transform: rotate(360deg);
   }
 }
+
+.brain-input {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    flex-direction: row;
+    margin: 0 auto;
+}
+
+.particles {
+    position: fixed;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    z-index: -1; /* Position in the layer we want the item*/
+}

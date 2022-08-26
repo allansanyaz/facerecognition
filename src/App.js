@@ -12,7 +12,7 @@ import Rank from './components/Rank/Rank'
 import FaceRecognition from './components/FaceRecognition/FaceRecognition';
 
 const app = new Clarifai.App({
-    apiKey: '7c00339e1db04c39a13c05393b2d5204'
+    apiKey: 'your-api-key-here'
 })
 
 const initialiseState = {

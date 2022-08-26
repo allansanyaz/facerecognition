@@ -12,28 +12,30 @@ import Rank from './components/Rank/Rank'
 import FaceRecognition from './components/FaceRecognition/FaceRecognition';
 
 const app = new Clarifai.App({
-    apiKey: 'your-key-here'
+    apiKey: '7c00339e1db04c39a13c05393b2d5204'
 })
+
+const initialiseState = {
+    input: '',
+    imageURL: '',
+    box: {},
+    route: 'signin',
+    isSignedIn: false,
+    user: {
+        id: '',
+        name: '',
+        email: '',
+        entries: 0,
+        joined: '',
+    }
+}
 
 class App extends React.Component {
     // define constructor
     constructor() {
         super();
         // route will keep track of what page I am on
-        this.state = {
-            input: '',
-            imageURL: '',
-            box: {},
-            route: 'signin',
-            isSignedIn: false,
-            user: {
-                id: '',
-                name: '',
-                email: '',
-                entries: 0,
-                joined: '',
-            }
-        }
+        this.state = initialiseState;
     }
 
     loadUser = (user) => {
@@ -97,7 +99,7 @@ class App extends React.Component {
 
     onRouteChange = (route) => {
         if(route === 'signin') {
-            this.setState({isSignedIn: false})
+            this.setState(initialiseState);
         } else if(route === 'home' ) {
             this.setState({isSignedIn: true})
         }

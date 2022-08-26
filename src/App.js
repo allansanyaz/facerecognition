@@ -12,7 +12,7 @@ import Rank from './components/Rank/Rank'
 import FaceRecognition from './components/FaceRecognition/FaceRecognition';
 
 const app = new Clarifai.App({
-    apiKey: '<Your API key here>'
+    apiKey: 'your-key-here'
 })
 
 class App extends React.Component {
@@ -79,7 +79,7 @@ class App extends React.Component {
             this.state.input)
             .then((response) => {
                 if(response) {
-                    fetch('http://localhost:4000/image', {
+                    fetch('http://localhost:3001/image', {
                         method: 'put',
                         headers: {'Content-Type': 'application/json'},
                         body: JSON.stringify({id: this.state.user.id})

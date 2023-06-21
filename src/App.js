@@ -12,7 +12,7 @@ import Rank from './components/Rank/Rank'
 import FaceRecognition from './components/FaceRecognition/FaceRecognition';
 
 const app = new Clarifai.App({
-    apiKey: 'your-api-key-here'
+    apiKey: process.env.REACT_APP_CLARIFAI_API_KEY
 })
 
 const initialiseState = {
@@ -77,7 +77,10 @@ class App extends React.Component {
         this.setState({imageURL: this.state.input});
         // other model is is: a403429f2ddf4b49b307e318f00e528b/face-detection
         app.models.predict(
-            Clarifai.FACE_DETECT_MODEL, 
+            {
+                id: "a403429f2ddf4b49b307e318f00e528b",
+                version: "34ce21a40cc24b6b96ffee54aabff139",
+            }, 
             this.state.input)
             .then((response) => {
                 if(response) {

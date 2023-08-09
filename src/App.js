@@ -18,7 +18,7 @@ const app = new Clarifai.App({
 const initialiseState = {
     input: '',
     imageURL: '',
-    box: {},
+    boxes: [],
     route: 'signin',
     isSignedIn: false,
     user: {
@@ -49,23 +49,34 @@ class App extends React.Component {
     }
 
     calculateFaceLocation = (data) => {
-        const clarifyFace = data.outputs[0].data.regions[0].region_info.bounding_box;
-        // dom manipulation
-        const image = document.getElementById("inputimage");
-        // bounding box is a percentage of the image
-        const width = image.width;
-        const height = image.height;
-        
-        return {
-            leftCol: width * clarifyFace.left_col,
-            topRow: height * clarifyFace.top_row,
-            rightCol: width - (width * clarifyFace.right_col),
-            bottomRow: height - (height * clarifyFace.bottom_row), 
-        }
+        // the regions have multiple items so we can loop through each returning the bounding box
+        const faceRegions = data.outputs[0].data.regions;
+        // loop through the face regions
+
+        // const clarifyFace = data.outputs[0].data.regions[0].region_info.bounding_box;
+
+        const clarifyFaces = faceRegions.map((faceRegion) => {
+            const clarifyFace = faceRegion.region_info.bounding_box;
+    
+            // dom manipulation
+            const image = document.getElementById("inputimage");
+            // bounding box is a percentage of the image
+            const width = image.width;
+            const height = image.height;
+            
+            return {
+                leftCol: width * clarifyFace.left_col,
+                topRow: height * clarifyFace.top_row,
+                rightCol: width - (width * clarifyFace.right_col),
+                bottomRow: height - (height * clarifyFace.bottom_row), 
+            }
+        });
+
+        return clarifyFaces;
     }
 
-    displayFaceBox = (box) => {
-        this.setState({box: box});
+    displayFaceBox = (boxes) => {
+        this.setState({boxes: boxes});
     }
 
     onInputChange = (event) => {
@@ -127,7 +138,7 @@ class App extends React.Component {
                             onButtonSubmit={this.onButtonSubmit} />
                         <FaceRecognition 
                             imageURL={this.state.imageURL}
-                            box={this.state.box}
+                            boxes={this.state.boxes}
                         />
                     </React.Fragment>
                 :   (

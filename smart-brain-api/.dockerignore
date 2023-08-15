@@ -1,3 +1,8 @@
+.git
 .env
 node_modules
 *.code-workspace
+./postgres_password.txt
+./postgres_user.txt
+Dockerfile
+docker-compose.yml

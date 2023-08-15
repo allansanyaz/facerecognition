@@ -25,3 +25,6 @@ yarn-error.log*
 
 .idea
 localhost.session.sql
+
+/smart-brain-api/postgres_password.txt
+/smart-brain-api/postgres_user.txt

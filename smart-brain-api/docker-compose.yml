@@ -1,14 +1,13 @@
 version: '3.6'
 
 services:
-    api:
+    smart-brain-api:
+      container_name: backend
       build: .
       command: npm start
       working_dir: /usr/src/smart-brain-api
       environment:
         POSTGRES_URI: postgres://smartbrain:smartbrain@postgres:5432/smartbrain-docker
-      links:
-        - postgres
       ports:
         - "3001:3001"
       volumes:
@@ -17,6 +16,7 @@ services:
         - postgres_password
         - postgres_user
     postgres:
+      container_name: postgres
       build: ./postgres
       environment:
         POSTGRES_USER_FILE: /run/secrets/postgres_user

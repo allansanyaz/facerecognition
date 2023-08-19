@@ -25,7 +25,7 @@ class Register extends React.Component {
 
     onSubmitRegister = () => {
         // fetch takes a second parameter of what to do with the response
-        fetch('http://localhost:3001/register', {
+        fetch('/register', {
             method: 'post',
             headers: {'Content-Type': 'application/json'},
             body: JSON.stringify({ 

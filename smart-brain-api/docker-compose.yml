@@ -12,6 +12,7 @@ services:
         - "3001:3001"
       volumes:
         - ./server.js:/usr/src/smart-brain-api/server.js
+        - ./controllers:/usr/src/smart-brain-api/controllers
       secrets:
         - postgres_password
         - postgres_user

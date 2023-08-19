@@ -32,13 +32,10 @@ app.use(cors());
 // don't forget that this is the server and therefore postman is the client
 // we are sending information to the client
 app.get('/', (req, res) => res.send("Success"));
-
 app.post('/signin', (req, res) => signin.handleSignin(req, res, knex, bcrypt));
-
 app.get('/profile/:id', (req, res) => profile.handleProfileGet(req, res, knex));
-
+app.post('/profile/:id', (req, res) => profile.handleProfileUpdate(req, res, knex));
 app.post('/register', (req, res) => register.handleRegister(req, res, knex, bcrypt));
-
 app.put('/image', (req, res) => image.handleImage(req, res, knex));
 
 // this also tells us the port that our server is listening on

@@ -23,14 +23,16 @@ const initialiseState = {
     boxes: [],
     route: 'signin',
     isSignedIn: false,
+    showProfile: false,
     user: {
         id: '',
         name: '',
         email: '',
         entries: 0,
         joined: '',
-    },
-    showProfile: false,
+        pet: '',
+        age: '',
+    }
 }
 
 class App extends React.Component {
@@ -48,6 +50,8 @@ class App extends React.Component {
             email: user.email,
             entries: user.entries,
             joined: user.joined,
+            pet: user.pet,
+            age: user.age,
         }})
     }
 
@@ -147,7 +151,9 @@ class App extends React.Component {
                             showProfile={this.state.showProfile}
                         >
                             <Profile 
-                                toggleProfile={this.toggleProfile} 
+                                toggleProfile={this.toggleProfile}
+                                user={this.state.user}
+                                state={this.state}
                             />   
                         </Modal>
 

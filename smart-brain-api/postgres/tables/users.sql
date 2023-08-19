@@ -5,7 +5,9 @@ CREATE TABLE IF NOT EXISTS users (
     name VARCHAR(100),
     email TEXT UNIQUE NOT NULL,
     entries BIGINT DEFAULT 0,
-    joined TIMESTAMP NOT NULL
+    joined TIMESTAMP NOT NULL,
+    age SMALLINT,
+    pet VARCHAR(100)
 );
 
 COMMIT;

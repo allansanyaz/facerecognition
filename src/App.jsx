@@ -10,6 +10,8 @@ import Logo from './components/logo/Logo';
 import ImageLinkForm from './components/ImageLinkForm/ImageLinkForm';
 import Rank from './components/Rank/Rank'
 import FaceRecognition from './components/FaceRecognition/FaceRecognition';
+import Modal from './components/Modal/Modal.component';
+import Profile from './components/profile/profile.modal.component';
 
 const app = new Clarifai.App({
     apiKey: process.env.REACT_APP_CLARIFAI_API_KEY
@@ -27,7 +29,8 @@ const initialiseState = {
         email: '',
         entries: 0,
         joined: '',
-    }
+    },
+    showProfile: false,
 }
 
 class App extends React.Component {
@@ -120,15 +123,34 @@ class App extends React.Component {
         this.setState({route: route});
     }
 
+    toggleProfile = () => {
+        this.setState(state => ({
+            ...state,
+            showProfile: !state.showProfile,
+        }));
+    }
+
     render () {
         // Each component including the particle has been separated into different components
         return (
             <div className="App">
                 <ParticleEffect />
-                <Navigation onRouteChange={this.onRouteChange} isSignedIn={this.state.isSignedIn} />
+                <Navigation 
+                    onRouteChange={this.onRouteChange} 
+                    isSignedIn={this.state.isSignedIn}
+                    toggleProfile={this.toggleProfile}
+                />
                 { this.state.route === 'home' 
-                ?   <React.Fragment>
+                ?   <>
                         <Logo />
+                        <Modal 
+                            showProfile={this.state.showProfile}
+                        >
+                            <Profile 
+                                toggleProfile={this.toggleProfile} 
+                            />   
+                        </Modal>
+
                         <Rank 
                             username={this.state.user.name}
                             userentries={this.state.user.entries}
@@ -140,7 +162,7 @@ class App extends React.Component {
                             imageURL={this.state.imageURL}
                             boxes={this.state.boxes}
                         />
-                    </React.Fragment>
+                    </>
                 :   (
                         this.state.route === 'signin' 
                         ? <SignIn 

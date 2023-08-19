@@ -53,3 +53,7 @@
     left: 0;
     z-index: -1; /* Position in the layer we want the item*/
 }
+
+.hover-bg-black:focus, .hover-bg-black:hover {
+    background-color: #000!important;
+}

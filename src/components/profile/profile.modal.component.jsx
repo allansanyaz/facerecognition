@@ -36,7 +36,9 @@ const Profile = ({ toggleProfile, user, state }) => {
                 // close the profile
                 toggleProfile();
             }
-        }).catch(console.log)
+        }).catch(error => {
+            console.log(error);
+        })
     }
 
     return (

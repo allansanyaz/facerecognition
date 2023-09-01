@@ -1,23 +1,68 @@
-const handleSignin = (req, res, knex, bcrypt) => {
+const jwt = require('jsonwebtoken');
+const redis = require('redis');
+
+// set up redis and create a client
+// if this is a docker container then docker has a different idea of what localhost is
+const redisClient = redis.createClient({ host: 'redis' });
+
+const handleSignin = (knex, bcrypt, req, res) => {
+    const { email, password } = req.body;
+    if(!email || !password) return Promise.reject('Incorrect form submission');
+
     // to use req.body we need to use body-parser
     // check the email and password against the database
-    knex.select('email', 'hash').from('login').where('email', '=', req.body.email)
+    return knex.select('email', 'hash').from('login').where('email', '=', req.body.email)
     .then(data => {
-        bcrypt.compare(req.body.password, data[0].hash).then(result => {
+        return bcrypt.compare(req.body.password, data[0].hash).then(result => {
             if(result) {
                 return knex.select('*').from('users').where('email', '=', req.body.email)
-                .then(user => {
-                    res.json(user[0])
-                })
-                .catch(err => res.status(400).json('Unable to get user'))
+                .then(user => user[0])
+                .catch(err => Promise.reject('Unable to get user'));
             } else {
-                res.status(400).json('Wrong credentials')
+                return Promise.reject('Wrong credentials');
             }
-        })
+        });
     })
-    .catch(err => res.status(400).json('Wrong user or password combination'))
+    .catch(err => {
+        console.log(err);
+        return Promise.reject('Wrong user or password combination');
+    });
 }
 
+const getAuthTokenId = (req, res) => {
+    console.log("Auth OK");
+}
+
+const signToken = (email) => {
+    const jwtPayload = { email }; 
+    return jwt.sign(jwtPayload, process.env.JWT_SECRET, { expiresIn: '2 days' });
+}
+
+const createSessions = (user) => {
+    // create JWT token and return user data
+    const { email, id } = user;
+    const token = signToken(email);
+
+    return { success: 'true', userId: id, token: token };
+}
+
+const siginInAuthentication = (knex, bcrypt) => (req, res) => {
+    const { authorization } = req.headers;
+    return authorization ? 
+        getAuthTokenId(req, res) : 
+        handleSignin(knex, bcrypt, req, res)
+            .then(data =>  {
+                return data.id && data.email ? createSessions(data) : Promise.reject(data);
+            })
+            .then(session => res.json(session))
+            .catch(err => {
+                console.log("*******");
+                console.log(err);
+                return res.status(400).json("Wrong user or password combination")
+            });
+}
+
+
 module.exports = {
-    handleSignin: handleSignin
+    siginInAuthentication: siginInAuthentication
 }

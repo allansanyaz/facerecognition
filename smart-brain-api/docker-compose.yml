@@ -6,16 +6,21 @@ services:
       build: .
       command: npm start
       working_dir: /usr/src/smart-brain-api
-      environment:
-        POSTGRES_URI: postgres://smartbrain:smartbrain@postgres:5432/smartbrain-docker
       ports:
         - "3001:3001"
       volumes:
         - ./server.js:/usr/src/smart-brain-api/server.js
         - ./controllers:/usr/src/smart-brain-api/controllers
-      secrets:
-        - postgres_password
-        - postgres_user
+      env_file:
+        - .env
+    redis:
+      container_name: redis
+      image: redis:7.0.12
+      command: redis-server
+      environment:
+        REDIS_HOST: redis
+      ports:
+        - "6379:6379"
     postgres:
       container_name: postgres
       build: ./postgres

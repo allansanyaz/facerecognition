@@ -42,7 +42,11 @@ const signToken = (email) => {
 }
 
 const setToken = (key, value) => {
-    return Promise.resolve(redisClient.set(key, value));
+    const redisPromise = Promise.resolve(redisClient.set(key, value));
+    // set an expiration for the key in the redis database
+    redisClient.expire(key, 2 * 24 * 60 * 60);
+    // return the promise
+    return redisPromise;
 }
 
 const createSessions = (user) => {

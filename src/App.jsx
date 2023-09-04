@@ -1,21 +1,16 @@
 import React from 'react';
 import './App.css';
-// Custom componets
+// Custom components
 import ParticleEffect from './components/ParticleEffect';
-import Clarifai from 'clarifai';
 import Navigation from './components/navigation/Navigation';
 import SignIn from './components/SignIn/SignIn';
 import Register from './components/Register/Register';
 import Logo from './components/logo/Logo';
 import ImageLinkForm from './components/ImageLinkForm/ImageLinkForm';
-import Rank from './components/Rank/Rank'
+import Rank from './components/Rank/Rank';
 import FaceRecognition from './components/FaceRecognition/FaceRecognition';
 import Modal from './components/Modal/Modal.component';
 import Profile from './components/profile/profile.modal.component';
-
-const app = new Clarifai.App({
-    apiKey: process.env.REACT_APP_CLARIFAI_API_KEY
-})
 
 const initialiseState = {
     input: '',
@@ -43,6 +38,56 @@ class App extends React.Component {
         this.state = initialiseState;
     }
 
+    componentDidMount() {
+        // check to see if there is a signed in session before rendering any logic
+        const token = window.localStorage.getItem('token');
+        if(token) {
+            fetch('/signin', {
+                method: 'post',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': token
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if(data && data.id) {
+                    this.getProfile(data);
+                }
+            })
+            .catch(console.log);
+        }
+    }
+
+    // get the user profile
+    getProfile = (data, token) => {
+        fetch(`/profile/${data.id}`, {
+            method: 'get',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': window.localStorage.getItem('token')
+            }
+            })
+            .then(response => response.json())
+            .then(user => {
+                if(user && user.email) {
+                    this.loadUser(user);
+                    this.onRouteChange('home');
+                }
+            })
+            .catch(err => console.log(err));
+    }
+
+    // handle userSignOut
+    onUserSignOut = () => {
+        // clear the token from local storage
+        window.localStorage.removeItem('token');
+        // reset the state
+        this.setState(initialiseState);
+        // navigate to the signin page
+        this.onRouteChange('signin');
+    }
+
     loadUser = (user) => {
         this.setState({user: {
             id: user.id,
@@ -52,38 +97,44 @@ class App extends React.Component {
             joined: user.joined,
             pet: user.pet,
             age: user.age,
-        }})
+        }});
     }
 
     calculateFaceLocation = (data) => {
-        // the regions have multiple items so we can loop through each returning the bounding box
-        const faceRegions = data.outputs[0].data.regions;
-        // loop through the face regions
+        if(data && data.outputs) {
+            // the regions have multiple items so we can loop through each returning the bounding box
+            const faceRegions = data.outputs[0].data.regions;
+            // loop through the face regions
 
-        // const clarifyFace = data.outputs[0].data.regions[0].region_info.bounding_box;
+            // const clarifyFace = data.outputs[0].data.regions[0].region_info.bounding_box;
 
-        const clarifyFaces = faceRegions.map((faceRegion) => {
-            const clarifyFace = faceRegion.region_info.bounding_box;
-    
-            // dom manipulation
-            const image = document.getElementById("inputimage");
-            // bounding box is a percentage of the image
-            const width = image.width;
-            const height = image.height;
-            
-            return {
-                leftCol: width * clarifyFace.left_col,
-                topRow: height * clarifyFace.top_row,
-                rightCol: width - (width * clarifyFace.right_col),
-                bottomRow: height - (height * clarifyFace.bottom_row), 
-            }
-        });
+            return faceRegions.map((faceRegion) => {
+                const clarifyFace = faceRegion.region_info.bounding_box;
 
-        return clarifyFaces;
+                // dom manipulation
+                const image = document.getElementById("inputimage");
+                // bounding box is a percentage of the image
+                const width = image.width;
+                const height = image.height;
+
+                return {
+                    leftCol: width * clarifyFace.left_col,
+                    topRow: height * clarifyFace.top_row,
+                    rightCol: width - (width * clarifyFace.right_col),
+                    bottomRow: height - (height * clarifyFace.bottom_row),
+                }
+            });
+        } else {
+            return;
+        }
     }
 
     displayFaceBox = (boxes) => {
-        this.setState({boxes: boxes});
+        if(boxes) {
+            this.setState({boxes: boxes});
+        } else {
+            this.setState({boxes: []});
+        }
     }
 
     onInputChange = (event) => {
@@ -93,18 +144,26 @@ class App extends React.Component {
 
     onButtonSubmit = () => {
         this.setState({imageURL: this.state.input});
-        // other model is is: a403429f2ddf4b49b307e318f00e528b/face-detection
-        app.models.predict(
-            {
-                id: "a403429f2ddf4b49b307e318f00e528b",
-                version: "34ce21a40cc24b6b96ffee54aabff139",
-            }, 
-            this.state.input)
-            .then((response) => {
-                if(response) {
+            // call the clarifai api
+            fetch('/imageurl', {
+                method: 'post',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': window.localStorage.getItem('token')
+                },
+                body: JSON.stringify({
+                    input: this.state.input
+                })
+            })
+            .then(response => response.json())
+            .then((data) => {
+                if(data) {
                     fetch('/image', {
                         method: 'put',
-                        headers: {'Content-Type': 'application/json'},
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Authorization': window.localStorage.getItem('token')
+                        },
                         body: JSON.stringify({id: this.state.user.id})
                     })
                     .then(response => response.json())
@@ -113,7 +172,7 @@ class App extends React.Component {
                     })
                     .catch(err => console.log(err));
                 }
-                this.displayFaceBox(this.calculateFaceLocation(response))
+                this.displayFaceBox(this.calculateFaceLocation(data));
             })
             .catch(err => console.log(err));
     }
@@ -139,10 +198,11 @@ class App extends React.Component {
         return (
             <div className="App">
                 <ParticleEffect />
-                <Navigation 
+                <Navigation
                     onRouteChange={this.onRouteChange} 
                     isSignedIn={this.state.isSignedIn}
                     toggleProfile={this.toggleProfile}
+                    onUserSignOut={this.onUserSignOut}
                 />
                 { this.state.route === 'home' 
                 ?   <>
@@ -172,7 +232,7 @@ class App extends React.Component {
                 :   (
                         this.state.route === 'signin' 
                         ? <SignIn 
-                            loadUser={this.loadUser}
+                            getProfile={this.getProfile}
                             onRouteChange={this.onRouteChange} 
                         />
                         : <Register 

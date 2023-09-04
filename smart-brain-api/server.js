@@ -12,6 +12,8 @@ const register = require('./controllers/register');
 const signin = require('./controllers/signin');
 const profile = require('./controllers/profile');
 const image = require('./controllers/image');
+const imageURL = require('./controllers/imageURL');
+const auth = require('./middleware/authorization');
 
 // define the PORT from the env file
 const PORT = process.env.PORT || 3001;
@@ -33,11 +35,12 @@ app.use(cors());
 // we are sending information to the client
 app.get('/', (req, res) => res.send("Success"));
 // app.post('/signin', signin.handleSignin(knex, bcrypt));
-app.post('/signin', signin.siginInAuthentication(knex, bcrypt));
-app.get('/profile/:id', (req, res) => profile.handleProfileGet(req, res, knex));
-app.post('/profile/:id', (req, res) => profile.handleProfileUpdate(req, res, knex));
+app.post('/signin', signin.signInAuthentication(knex, bcrypt));
 app.post('/register', (req, res) => register.handleRegister(req, res, knex, bcrypt));
-app.put('/image', (req, res) => image.handleImage(req, res, knex));
+app.get('/profile/:id', auth.requireAuth, (req, res) => profile.handleProfileGet(req, res, knex));
+app.post('/profile/:id', auth.requireAuth, (req, res) => profile.handleProfileUpdate(req, res, knex));
+app.put('/image', auth.requireAuth, (req, res) => image.handleImage(req, res, knex));
+app.post('/imageurl', auth.requireAuth, (req, res) => imageURL.handleImageURL(req, res));
 
 // this also tells us the port that our server is listening on
 app.listen(PORT, () => {

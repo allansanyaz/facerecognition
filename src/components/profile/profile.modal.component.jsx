@@ -25,7 +25,10 @@ const Profile = ({ toggleProfile, user, state }) => {
     const onUpdateProfile = () => {
         fetch(`/profile/${user.id}`, {
             method: 'post',
-            headers: {'Content-Type': 'application/json'},
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': window.localStorage.getItem('token')
+            },
             body: JSON.stringify({ formInput: { name, age, pet } })
         }).then(resp => {
             // if the response is ok, then update the state

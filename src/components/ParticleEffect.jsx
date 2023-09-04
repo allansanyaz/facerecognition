@@ -1,4 +1,4 @@
-// Custom custom code for the particles
+// Custom code for the particles
 import React from "react";
 import Particles from "react-tsparticles";
 import { loadFull } from "tsparticles";

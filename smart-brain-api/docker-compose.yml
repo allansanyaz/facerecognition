@@ -11,6 +11,7 @@ services:
       volumes:
         - ./server.js:/usr/src/smart-brain-api/server.js
         - ./controllers:/usr/src/smart-brain-api/controllers
+        - ./middleware:/usr/src/smart-brain-api/middleware
       env_file:
         - .env
     redis:

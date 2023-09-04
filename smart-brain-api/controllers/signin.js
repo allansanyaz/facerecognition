@@ -29,8 +29,15 @@ const handleSignin = (knex, bcrypt, req, res) => {
     });
 }
 
-const getAuthTokenId = (req, res) => {
-    console.log("Auth OK");
+const getAuthTokenId = async(req, res) => {
+    const { authorization } = req.headers;
+    return await redisClient.get(authorization, (err, reply) => {
+        if(err || !reply) {
+            return res.status(401).json('Unauthorized');
+        } else {
+            return res.json({id: reply});
+        }
+    });
 }
 
 const signToken = (email) => {
@@ -38,15 +45,21 @@ const signToken = (email) => {
     return jwt.sign(jwtPayload, process.env.JWT_SECRET, { expiresIn: '2 days' });
 }
 
+const setToken = (key, value) => {
+    return Promise.resolve(redisClient.set(key, value));
+}
+
 const createSessions = (user) => {
     // create JWT token and return user data
     const { email, id } = user;
     const token = signToken(email);
 
-    return { success: 'true', userId: id, token: token };
+    return setToken(token, id)
+        .then(() => ({'success': true, 'id': id, token}))
+        .catch(err => console.log(err));
 }
 
-const siginInAuthentication = (knex, bcrypt) => (req, res) => {
+const signInAuthentication = (knex, bcrypt) => (req, res) => {
     const { authorization } = req.headers;
     return authorization ? 
         getAuthTokenId(req, res) : 
@@ -56,13 +69,12 @@ const siginInAuthentication = (knex, bcrypt) => (req, res) => {
             })
             .then(session => res.json(session))
             .catch(err => {
-                console.log("*******");
                 console.log(err);
                 return res.status(400).json("Wrong user or password combination")
             });
 }
 
-
 module.exports = {
-    siginInAuthentication: siginInAuthentication
+    signInAuthentication: signInAuthentication,
+    redisClient: redisClient
 }

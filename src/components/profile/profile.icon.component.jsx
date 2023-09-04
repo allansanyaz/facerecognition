@@ -7,7 +7,7 @@ import {
   } from 'reactstrap';
 import PropTypes from 'prop-types';
 
-const ProfileIcon = ({ onRouteChange, toggleProfile, direction, ...args }) => {
+const ProfileIcon = ({ onUserSignOut, toggleProfile, direction, ...args }) => {
 
     const [dropdownOpen, setDropdownOpen] = useState(false);
 
@@ -35,7 +35,7 @@ const ProfileIcon = ({ onRouteChange, toggleProfile, direction, ...args }) => {
                     </DropdownItem>
                     <DropdownItem
                         className='f5 link dim black pointer' style={{ marginBottom: 0, textAlign: 'center' }}
-                        onClick={() => onRouteChange('signin')}
+                        onClick={() => onUserSignOut()}
                     >
                         Sign Out
                     </DropdownItem>

@@ -1,10 +1,13 @@
 const handleProfileGet = (req, res, knex) => {
     const { id } = req.params;
+
+    if(!id) return res.status(400).json('User is not signed in');
+
     // if there is nothing it will return an empty array
     knex.select('*').from('users').where('id', id)
     .then(user => {
         if(!(user.length === 0)) {
-            res.json(user)
+            res.json(user[0])
         } else {
             res.status(400).json('Page not found');
         }

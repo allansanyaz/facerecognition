@@ -1,20 +1,17 @@
 const redisClient = require('../redis/redis').redisClient;
 
-const requireAuth = (req, res, next) => {
+const handleSignout = (req, res, db) => {
     const { authorization } = req.headers;
 
-    if(!authorization) {
-        return res.status(401).json('Unauthorized');
-    }
-    return redisClient.get(authorization, (err, reply) => {
+    return redisClient.del(authorization, (err, reply) => {
         if(err || !reply) {
             return res.status(401).json('Unauthorized');
         } else {
-            return next();
+            return res.json({"success": true});
         }
     });
-}
+};
 
 module.exports = {
-    requireAuth: requireAuth
+    handleSignout: handleSignout
 }

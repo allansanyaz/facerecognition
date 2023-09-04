@@ -1,9 +1,5 @@
 const jwt = require('jsonwebtoken');
-const redis = require('redis');
-
-// set up redis and create a client
-// if this is a docker container then docker has a different idea of what localhost is
-const redisClient = redis.createClient({ host: 'redis' });
+const redisClient = require('../redis/redis').redisClient;
 
 const handleSignin = (knex, bcrypt, req, res) => {
     const { email, password } = req.body;
@@ -76,6 +72,5 @@ const signInAuthentication = (knex, bcrypt) => (req, res) => {
 
 module.exports = {
     signInAuthentication: signInAuthentication,
-    redisClient: redisClient,
     createSessions: createSessions
 }

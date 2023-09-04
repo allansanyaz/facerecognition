@@ -13,6 +13,7 @@ const signin = require('./controllers/signin');
 const profile = require('./controllers/profile');
 const image = require('./controllers/image');
 const imageURL = require('./controllers/imageURL');
+const signout = require('./controllers/signout');
 const auth = require('./middleware/authorization');
 
 // define the PORT from the env file
@@ -41,6 +42,7 @@ app.get('/profile/:id', auth.requireAuth, (req, res) => profile.handleProfileGet
 app.post('/profile/:id', auth.requireAuth, (req, res) => profile.handleProfileUpdate(req, res, knex));
 app.put('/image', auth.requireAuth, (req, res) => image.handleImage(req, res, knex));
 app.post('/imageurl', auth.requireAuth, (req, res) => imageURL.handleImageURL(req, res));
+app.post('/signout', auth.requireAuth, (req, res) => signout.handleSignout(req, res));
 
 // this also tells us the port that our server is listening on
 app.listen(PORT, () => {

@@ -85,12 +85,26 @@ class App extends React.Component {
 
     // handle userSignOut
     onUserSignOut = () => {
-        // clear the token from local storage
-        window.localStorage.removeItem('token');
-        // reset the state
-        this.setState(initialiseState);
-        // navigate to the signin page
-        this.onRouteChange('signin');
+        // first sign out on the server
+        fetch('/signout', {
+            method: 'post',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': window.localStorage.getItem('token')
+            }
+        })
+        .then(resp => {
+            if(resp.status === 200 || resp.status === 304) {
+                // clear the token from local storage
+                window.localStorage.removeItem('token');
+                // reset the state
+                this.setState(initialiseState);
+                // navigate to the signin page
+                this.onRouteChange('signin');
+            }
+        })
+        .catch(err => console.log(err));
+
     }
 
     loadUser = (user) => {

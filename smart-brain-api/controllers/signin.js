@@ -44,7 +44,7 @@ const signToken = (email) => {
 const setToken = (key, value) => {
     const redisPromise = Promise.resolve(redisClient.set(key, value));
     // set an expiration for the key in the redis database
-    redisClient.expire(key, 7 * 24 * 60 * 60);
+    redisClient.expire(key, 7 * 24 * 60 * 60); // 7 days
     // return the promise
     return redisPromise;
 }

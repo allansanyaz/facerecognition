@@ -1,3 +1,5 @@
+const createSessions = require('./signin').createSessions;
+
 const handleRegister = (req, res, knex, bcrypt) => {
     const {email, name, password} = req.body;
 
@@ -19,7 +21,9 @@ const handleRegister = (req, res, knex, bcrypt) => {
                         joined: new Date(),
                     })
                     .then(user => {
-                        res.json(user[0]);
+                        createSessions(user[0])
+                            .then(session => res.json(session))
+                            .catch(err => res.status(400).json(err));
                     })
                 })
                 .then(trx.commit)

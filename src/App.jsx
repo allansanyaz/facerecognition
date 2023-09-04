@@ -59,8 +59,13 @@ class App extends React.Component {
         }
     }
 
+    saveAuthTokenInSession = (token) => {
+        window.localStorage.setItem('token', token);
+    }
+
     // get the user profile
-    getProfile = (data, token) => {
+    getProfile = (data) => {
+        console.log("Getting profile for data: ", data);
         fetch(`/profile/${data.id}`, {
             method: 'get',
             headers: {
@@ -233,11 +238,13 @@ class App extends React.Component {
                         this.state.route === 'signin' 
                         ? <SignIn 
                             getProfile={this.getProfile}
-                            onRouteChange={this.onRouteChange} 
+                            onRouteChange={this.onRouteChange}
+                            saveAuthTokenInSession={this.saveAuthTokenInSession}
                         />
                         : <Register 
-                            loadUser={this.loadUser}
-                            onRouteChange={this.onRouteChange} 
+                            getProfile={this.getProfile}
+                            onRouteChange={this.onRouteChange}
+                            saveAuthTokenInSession={this.saveAuthTokenInSession}
                         />
                     )
                     

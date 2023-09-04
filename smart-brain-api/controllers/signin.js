@@ -76,5 +76,6 @@ const signInAuthentication = (knex, bcrypt) => (req, res) => {
 
 module.exports = {
     signInAuthentication: signInAuthentication,
-    redisClient: redisClient
+    redisClient: redisClient,
+    createSessions: createSessions
 }

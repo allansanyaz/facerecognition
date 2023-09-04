@@ -35,9 +35,10 @@ class Register extends React.Component {
             })
         })
         .then(response => response.json())
-        .then(user => {
-            if(user.id) {
-                this.props.loadUser(user);
+        .then(data => {
+            if(data.id) {
+                this.props.saveAuthTokenInSession(data.token);
+                this.props.getProfile(data);
                 this.props.onRouteChange('home');
             }
         });
